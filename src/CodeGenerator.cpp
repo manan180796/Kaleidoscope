@@ -160,6 +160,39 @@ namespace kaleidoscope {
         // "merges" from then_block and else_block
         llvm::BasicBlock* merge_block =
             llvm::BasicBlock::Create(context, "merge");
+
+        // create a if else branch
+        builder.CreateCondBr(condition_value, then_block, else_block);
+
+        // set the new insertion point to the "end" of yet "empty" then block so
+        // essentially it is at the begining of the then block
+        builder.SetInsertPoint(then_block);
+
+        llvm::Value* then_value;
+        if_else_expression.get_if_expression().accept(*this);
+        get_result(then_value);
+
+        builder.CreateBr(merge_block);
+
+        // get the last block built in the then codegen
+        then_block = builder.GetInsertBlock();
+
+        llvm::Value* else_value;
+        if_else_expression.get_else_expression().accept(*this);
+        get_result(else_value);
+
+        // get the last block built in the else codegen
+        else_block = builder.GetInsertBlock();
+
+        function->getBasicBlockList().push_back(merge_block);
+        builder.SetInsertPoint(merge_block);
+
+        llvm::PHINode* phi_node =
+            builder.CreatePHI(llvm::Type::getDoubleTy(context), 2, "ifcond");
+
+        phi_node->addIncoming(then_value, then_block);
+        phi_node->addIncoming(else_value, else_block);
+        return return_result(phi_node);
     }
     // returns Value*
     void CodeGenerator::visit(const CallExpression& call_expression) {
