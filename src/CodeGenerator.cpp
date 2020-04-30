@@ -143,6 +143,7 @@ namespace kaleidoscope {
         get_result(condition_value);
         if (!condition_value) return return_result((llvm::Value*)nullptr);
 
+
         condition_value = builder.CreateFCmpONE(
             condition_value, llvm::ConstantFP::get(context, llvm::APFloat(0.0)),
             "ifcond");
@@ -164,6 +165,8 @@ namespace kaleidoscope {
         // create a if else branch
         builder.CreateCondBr(condition_value, then_block, else_block);
 
+
+        function->getBasicBlockList().push_back(then_block);
         // set the new insertion point to the "end" of yet "empty" then block so
         // essentially it is at the begining of the then block
         builder.SetInsertPoint(then_block);
@@ -177,9 +180,16 @@ namespace kaleidoscope {
         // get the last block built in the then codegen
         then_block = builder.GetInsertBlock();
 
+
+        // push the else block into the function
+        function->getBasicBlockList().push_back(else_block);
+        builder.SetInsertPoint(else_block);
+
         llvm::Value* else_value;
         if_else_expression.get_else_expression().accept(*this);
         get_result(else_value);
+
+        builder.CreateBr(merge_block);
 
         // get the last block built in the else codegen
         else_block = builder.GetInsertBlock();
@@ -187,12 +197,15 @@ namespace kaleidoscope {
         function->getBasicBlockList().push_back(merge_block);
         builder.SetInsertPoint(merge_block);
 
+
         llvm::PHINode* phi_node =
             builder.CreatePHI(llvm::Type::getDoubleTy(context), 2, "ifcond");
 
+
         phi_node->addIncoming(then_value, then_block);
         phi_node->addIncoming(else_value, else_block);
-        return return_result(phi_node);
+        return_result(phi_node);
+        return;
     }
     // returns Value*
     void CodeGenerator::visit(const CallExpression& call_expression) {
@@ -245,13 +258,16 @@ namespace kaleidoscope {
         for (auto& argument : llvm_function->args()) {
             named_values[argument.getName()] = &argument;
         }
-        function.get_body().accept(*this);
+
         llvm::Value* ret_code;
+        function.get_body().accept(*this);
         get_result(ret_code);
+
         if (ret_code) {
             builder.CreateRet(ret_code);
             llvm::verifyFunction(*llvm_function);
             function_pass_manager->run(*llvm_function);
+            cerr << "reached here" << std::endl;
             return return_result(llvm_function);
         }
         llvm_function->removeFromParent();
