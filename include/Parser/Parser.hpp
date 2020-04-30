@@ -23,6 +23,7 @@ namespace kaleidoscope {
         std::unique_ptr<Expression> binary_expression();
         std::unique_ptr<Prototype> prototype();
         std::unique_ptr<IfElseExpression> if_else_expression();
+        std::unique_ptr<ForExpression> for_expression();
         std::pair<std::unique_ptr<Prototype>, std::unique_ptr<Function>>
         function();
         std::pair<std::unique_ptr<Prototype>, std::unique_ptr<Function>>

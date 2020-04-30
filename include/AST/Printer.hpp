@@ -10,6 +10,9 @@ namespace kaleidoscope {
         std::vector<int> header;
         const std::string t, h, e;
         void print_header();
+        void new_level(int nodes);
+        void finish_level();
+        void print_line(const std::string& message);
 
       public:
         Printer(std::ostream& cout);
@@ -17,7 +20,8 @@ namespace kaleidoscope {
             const AbstractSyntaxNode& abstract_syntax_node) override;
         virtual void visit(const BinaryExpression& binary_expression) override;
         virtual void visit(const CallExpression& call_expression) override;
-        virtual void visit(const Expression& abstract_syntax_node) override;
+        virtual void visit(const Expression& expression) override;
+        virtual void visit(const ForExpression& for_expression) override;
         virtual void visit(const Function& function) override;
         virtual void visit(const IfElseExpression& function) override;
         virtual void visit(const NumberExpression& number_expression) override;
