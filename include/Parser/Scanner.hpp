@@ -20,7 +20,9 @@ namespace kaleidoscope {
                 _char_,
                 _if_,
                 _else_,
-                _then_
+                _then_,
+                _for_,
+                _do_
             } type;
             struct Content {
                 std::string name;

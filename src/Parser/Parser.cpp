@@ -146,6 +146,12 @@ namespace kaleidoscope {
         return std::make_unique<IfElseExpression>(
             std::move(condition), std::move(if_exp), std::move(else_exp));
     }
+    std::unique_ptr<ForExpression> Parser::for_expression() {
+        if (last_token.type != Scanner::Token::_for_) {
+            return error_logger("expected \"for\" keyword");
+        }
+        update_token();
+    }
     std::unique_ptr<Prototype> Parser::prototype() {
         if (last_token.type != last_token._identifier_) {
             return error_logger("Expected function name in prototype");

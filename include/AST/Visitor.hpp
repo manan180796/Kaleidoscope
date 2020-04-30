@@ -9,6 +9,7 @@ namespace kaleidoscope {
         virtual void visit(const BinaryExpression& binary_expression) = 0;
         virtual void visit(const CallExpression& call_expression) = 0;
         virtual void visit(const Expression& abstract_syntax_node) = 0;
+        virtual void visit(const ForExpression& for_expression) = 0;
         virtual void visit(const Function& function) = 0;
         virtual void visit(const NumberExpression& number_expression) = 0;
         virtual void visit(const Prototype& prototype) = 0;

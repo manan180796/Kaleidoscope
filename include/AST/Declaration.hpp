@@ -5,6 +5,7 @@ namespace kaleidoscope {
     class BinaryExpression;
     class CallExpression;
     class Expression;
+    class ForExpression;
     class Function;
     class IfElseExpression;
     class NumberExpression;
