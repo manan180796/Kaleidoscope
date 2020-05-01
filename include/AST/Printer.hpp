@@ -13,6 +13,7 @@ namespace kaleidoscope {
         void new_level(int nodes);
         void finish_level();
         void print_line(const std::string& message);
+        void print_line(const char& message);
 
       public:
         Printer(std::ostream& cout);

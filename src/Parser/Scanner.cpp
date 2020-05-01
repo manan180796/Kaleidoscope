@@ -27,6 +27,10 @@ namespace kaleidoscope {
                 token.type = Token::_else_;
             else if (token.content.name == "then")
                 token.type = Token::_then_;
+            else if (token.content.name == "for")
+                token.type = Token::_for_;
+            else if (token.content.name == "do")
+                token.type = Token::_do_;
             else
                 token.type = Token::_identifier_;
 

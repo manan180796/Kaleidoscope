@@ -236,7 +236,8 @@ namespace kaleidoscope {
         }
     }
 
-    void CodeGenerator::visit(const Expression& abstract_syntax_node) {}
+    void CodeGenerator::visit(const Expression& expression) {}
+    void CodeGenerator::visit(const ForExpression& for_expression) {}
 
     // returns Function*
     void CodeGenerator::visit(const Function& function) {

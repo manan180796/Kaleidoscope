@@ -33,6 +33,11 @@ add_library(Expression OBJECT
 )
 target_include_directories(Expression PUBLIC ../../include)
 
+add_library(ForExpression STATIC
+    ForExpression.cpp ${AST_PATH}/ForExpression.hpp
+)
+target_include_directories(ForExpression PUBLIC ../../include)
+
 add_library(Function STATIC
     Function.cpp ${AST_PATH}/Function.hpp
 )
@@ -72,6 +77,7 @@ target_link_libraries(AST
     BinaryExpression
     CallExpression
     Expression
+    ForExpression
     Function
     IfElseExpression
     NumberExpression
@@ -98,6 +104,10 @@ target_link_libraries(CallExpression
 
 target_link_libraries(Expression 
     AbstractSyntaxNode
+)
+target_link_libraries(ForExpression 
+    Expression
+    Variable
 )
 
 target_link_libraries(Function 

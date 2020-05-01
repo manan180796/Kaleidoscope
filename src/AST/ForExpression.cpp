@@ -3,14 +3,19 @@
     #include <AST/ForExpression.hpp>
     #include <memory>
 namespace kaleidoscope {
-    ForExpression::ForExpression(std::unique_ptr<Expression> initialize,
+    ForExpression::ForExpression(std::unique_ptr<Variable> loop_variable,
+                                 std::unique_ptr<Expression> initialize,
                                  std::unique_ptr<Expression> condition,
                                  std::unique_ptr<Expression> update,
                                  std::unique_ptr<Expression> body)
-        : initialize(std::move(initialize)),
+        : loop_variable(std::move(loop_variable)),
+          initialize(std::move(initialize)),
           condition(std::move(condition)),
           update(std::move(update)),
           body(std::move(body)) {}
+    const Variable& ForExpression::get_loop_variable() const {
+        return *loop_variable;
+    }
     const Expression& ForExpression::get_initialize() const {
         return *initialize;
     }

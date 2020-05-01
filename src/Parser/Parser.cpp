@@ -70,6 +70,8 @@ namespace kaleidoscope {
                 return number_expression();
             case Scanner::Token::_if_:
                 return if_else_expression();
+            case Scanner::Token::_for_:
+                return for_expression();
             case Scanner::Token::_char_:
                 if (last_token.content.name == "(") {
                     return parenthesis_expression();
@@ -150,7 +152,45 @@ namespace kaleidoscope {
         if (last_token.type != Scanner::Token::_for_) {
             return error_logger("expected \"for\" keyword");
         }
+
         update_token();
+        if (last_token.type != Scanner::Token::_identifier_) {
+            return error_logger("expected a loop variable");
+        }
+        std::unique_ptr<Variable> loop_variable =
+            std::make_unique<Variable>(last_token.content.name);
+
+        update_token();
+        if (last_token.content.name != "=") {
+            return error_logger("expected a \'=\' for the loop variable");
+        }
+
+        update_token();
+        std::unique_ptr<Expression> initial_value = expression();
+        if (!initial_value) return nullptr;
+
+        if (last_token.content.name != ",")
+            return error_logger("expected a \',\'");
+
+        update_token();
+        std::unique_ptr<Expression> condition = expression();
+        if (!condition) return nullptr;
+
+        if (last_token.content.name != ",")
+            return error_logger("expected a \',\'");
+
+        update_token();
+        std::unique_ptr<Expression> update = expression();
+        if (!update) return nullptr;
+
+        if (last_token.type != Scanner::Token::_do_)
+            return error_logger("expected a \'do\' after the update statement");
+        update_token();
+        std::unique_ptr<Expression> body = expression();
+        if (!body) return nullptr;
+        return std::make_unique<ForExpression>(
+            std::move(loop_variable), std::move(initial_value),
+            std::move(condition), std::move(update), std::move(body));
     }
     std::unique_ptr<Prototype> Parser::prototype() {
         if (last_token.type != last_token._identifier_) {

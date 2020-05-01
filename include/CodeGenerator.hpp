@@ -35,7 +35,8 @@ namespace kaleidoscope {
             const AbstractSyntaxNode& abstract_syntax_node) override;
         virtual void visit(const BinaryExpression& binary_expression) override;
         virtual void visit(const CallExpression& call_expression) override;
-        virtual void visit(const Expression& abstract_syntax_node) override;
+        virtual void visit(const Expression& expression) override;
+        virtual void visit(const ForExpression& for_expression) override;
         virtual void visit(const Function& function) override;
         virtual void visit(const IfElseExpression& if_else_expression) override;
         virtual void visit(const NumberExpression& number_expression) override;

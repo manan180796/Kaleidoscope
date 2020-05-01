@@ -25,12 +25,16 @@ namespace kaleidoscope {
         print_header();
         cout << message << std::endl;
     }
+    void Printer::print_line(const char& message) {
+        print_header();
+        cout << message << std::endl;
+    }
     void Printer::visit(const AbstractSyntaxNode& abstract_syntax_node) {}
     void Printer::visit(const BinaryExpression& binary_expression) {
         print_line("<BinaryExpression>");
         new_level(3);
         binary_expression.get_lhs().accept(*this);
-        print_line(std::to_string(binary_expression.get_op()));
+        print_line(((char)binary_expression.get_op()));
         binary_expression.get_rhs().accept(*this);
         finish_level();
     }
@@ -53,7 +57,8 @@ namespace kaleidoscope {
         print_line("Control");
         new_level(3);
         print_line("Initialize");
-        new_level(1);
+        new_level(2);
+        for_expression.get_loop_variable().accept(*this);
         for_expression.get_initialize().accept(*this);
         finish_level();
         print_line("Condition");
