@@ -16,6 +16,9 @@ namespace kaleidoscope {
     const Variable& ForExpression::get_loop_variable() const {
         return *loop_variable;
     }
+    const std::string& ForExpression::get_loop_variable_name() const {
+        return loop_variable->get_name();
+    }
     const Expression& ForExpression::get_initialize() const {
         return *initialize;
     }

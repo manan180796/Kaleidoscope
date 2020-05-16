@@ -26,7 +26,7 @@ namespace kaleidoscope {
             cout << "ready> ";
             cout.flush();
         }
-        // code_generator.get_module().print(llvm::outs(), nullptr);
+        code_generator.get_module().print(llvm::outs(), nullptr);
         cout.flush();
     }
     void Driver::function() {
@@ -44,11 +44,14 @@ namespace kaleidoscope {
     }
     void Driver::top_expression() {
         auto f = parser.top_expression();
-        f.second->accept(printer);
-        // code_generator.add_definition(std::move(f));
-        // auto m = code_generator.commit_module();
-        // code_generator.execute();
-        // code_generator.remove_module(m);
+        // f.second->accept(printer);
+        code_generator.add_definition(std::move(f));
+        // llvm::Function* func;
+        // code_generator.get_result(func);
+        // func->print(llvm::outs());
+        auto m = code_generator.commit_module();
+        code_generator.execute();
+        code_generator.remove_module(m);
     }
 
 }  // namespace kaleidoscope

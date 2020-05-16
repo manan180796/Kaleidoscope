@@ -18,6 +18,7 @@ namespace kaleidoscope {
                       std::unique_ptr<Expression> update,
                       std::unique_ptr<Expression> body);
         const Variable& get_loop_variable() const;
+        const std::string& get_loop_variable_name() const;
         const Expression& get_initialize() const;
         const Expression& get_condition() const;
         const Expression& get_update() const;

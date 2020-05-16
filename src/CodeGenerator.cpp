@@ -237,7 +237,72 @@ namespace kaleidoscope {
     }
 
     void CodeGenerator::visit(const Expression& expression) {}
-    void CodeGenerator::visit(const ForExpression& for_expression) {}
+    void CodeGenerator::visit(const ForExpression& for_expression) {
+        // initial value code
+        llvm::Value* start;
+        for_expression.get_initialize().accept(*this);
+        get_result(start);
+        if (!start) return return_result((llvm::Value*)nullptr);
+
+        llvm::BasicBlock* pre_loop_block = builder.GetInsertBlock();
+
+        llvm::Function* function = builder.GetInsertBlock()->getParent();
+
+        llvm::BasicBlock* loop =
+            llvm::BasicBlock::Create(context, "loop", function);
+        builder.CreateBr(loop);
+
+        builder.SetInsertPoint(loop);
+
+        llvm::PHINode* loop_variable =
+            builder.CreatePHI(llvm::Type::getDoubleTy(context), 2,
+                              for_expression.get_loop_variable_name());
+        loop_variable->addIncoming(start, pre_loop_block);
+        llvm::Value* shadowed_var =
+            named_values[for_expression.get_loop_variable_name()];
+        named_values[for_expression.get_loop_variable_name()] = loop_variable;
+
+        llvm::Value* body;
+        for_expression.get_body().accept(*this);
+        get_result(body);
+        if (!body) return return_result((llvm::Value*)nullptr);
+
+        llvm::Value* update = nullptr;
+        for_expression.get_update().accept(*this);
+        get_result(update);
+        if (!update) return return_result((llvm::Value*)nullptr);
+
+        llvm::Value* next_value =
+            builder.CreateFAdd(loop_variable, update, "update");
+
+        llvm::Value* condition = nullptr;
+        for_expression.get_condition().accept(*this);
+        get_result(condition);
+        if (!condition) return return_result((llvm::Value*)nullptr);
+
+        condition = builder.CreateFCmpONE(
+            condition, llvm::ConstantFP::get(context, llvm::APFloat(0.0)),
+            "condition");
+
+        llvm::BasicBlock* loop_end = builder.GetInsertBlock();
+
+        llvm::BasicBlock* after_loop =
+            llvm::BasicBlock::Create(context, "after_loop", function);
+
+        builder.CreateCondBr(condition, loop, after_loop);
+
+        builder.SetInsertPoint(after_loop);
+
+        loop_variable->addIncoming(next_value, loop);
+
+        if (shadowed_var)
+            named_values[for_expression.get_loop_variable_name()] =
+                shadowed_var;
+        else
+            named_values.erase(for_expression.get_loop_variable_name());
+        return return_result(
+            llvm::Constant::getNullValue(llvm::Type::getDoubleTy(context)));
+    }
 
     // returns Function*
     void CodeGenerator::visit(const Function& function) {
@@ -268,7 +333,6 @@ namespace kaleidoscope {
             builder.CreateRet(ret_code);
             llvm::verifyFunction(*llvm_function);
             function_pass_manager->run(*llvm_function);
-            cerr << "reached here" << std::endl;
             return return_result(llvm_function);
         }
         llvm_function->removeFromParent();
